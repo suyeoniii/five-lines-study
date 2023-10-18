@@ -676,9 +676,8 @@ class Right implements Input {
   isDown() {
     return false;
   }
-
   handle() {
-    moveHorizontal(-1);
+    moveHorizontal(1);
   }
 }
 
@@ -695,9 +694,8 @@ class Left implements Input {
   isDown() {
     return false;
   }
-
   handle() {
-    moveHorizontal(1);
+    moveHorizontal(-1);
   }
 }
 
