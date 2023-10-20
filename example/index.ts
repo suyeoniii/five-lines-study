@@ -11,6 +11,10 @@ class FallStrategy {
 
   update(tile: Tile, x: number, y: number) {
     this.falling = map[y + 1][x].isAir() ? new Falling() : new Resting();
+    this.drop(y, x, tile);
+  }
+
+  private drop(y: number, x: number, tile: Tile) {
     if (this.falling.isFalling()) {
       map[y + 1][x] = tile;
       map[y][x] = new Air();
