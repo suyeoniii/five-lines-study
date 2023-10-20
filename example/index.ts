@@ -364,7 +364,9 @@ class Box implements Tile {
   }
 }
 
-class Key1 implements Tile {
+class Key implements Tile {
+  constructor(private color: string, private removeStrategy: RemoveStrategy) {}
+
   isAir(): boolean {
     return false;
   }
@@ -384,11 +386,11 @@ class Key1 implements Tile {
     return false;
   }
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-    g.fillStyle = "#ffcc00";
+    g.fillStyle = this.color;
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
   moveHorizontal(dx: number) {
-    remove(new RemoveLock1());
+    remove(this.removeStrategy);
     moveToTile(playerx + dx, playery);
   }
   isStony() {
@@ -409,6 +411,7 @@ class Key1 implements Tile {
 }
 
 class Lock1 implements Tile {
+  constructor(private color: string, private lock1: boolean) {}
   isAir(): boolean {
     return false;
   }
@@ -419,100 +422,16 @@ class Lock1 implements Tile {
     return false;
   }
   isLock1(): boolean {
-    return true;
+    return this.lock1;
   }
   isKey2(): boolean {
     return false;
   }
   isLock2(): boolean {
-    return false;
+    return !this.lock1;
   }
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-    g.fillStyle = "#ffcc00";
-    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-  }
-  moveHorizontal(dx: number) {}
-  isStony() {
-    return false;
-  }
-  isBoxy() {
-    return false;
-  }
-  drop() {}
-  rest() {}
-  isFalling() {
-    return false;
-  }
-  canFall() {
-    return false;
-  }
-  update(x: number, y: number) {}
-}
-
-class Key2 implements Tile {
-  isAir(): boolean {
-    return false;
-  }
-  isFlux(): boolean {
-    return false;
-  }
-  isKey1(): boolean {
-    return false;
-  }
-  isLock1(): boolean {
-    return false;
-  }
-  isKey2(): boolean {
-    return true;
-  }
-  isLock2(): boolean {
-    return false;
-  }
-  draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-    g.fillStyle = "#00ccff";
-    g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-  }
-  moveHorizontal(dx: number) {
-    remove(new RemoveLock2());
-  }
-  isStony() {
-    return false;
-  }
-  isBoxy() {
-    return false;
-  }
-  drop() {}
-  rest() {}
-  isFalling() {
-    return false;
-  }
-  canFall() {
-    return false;
-  }
-  update(x: number, y: number) {}
-}
-
-class Lock2 implements Tile {
-  isAir(): boolean {
-    return false;
-  }
-  isFlux(): boolean {
-    return false;
-  }
-  isKey1(): boolean {
-    return false;
-  }
-  isLock1(): boolean {
-    return false;
-  }
-  isKey2(): boolean {
-    return false;
-  }
-  isLock2(): boolean {
-    return true;
-  }
-  draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-    g.fillStyle = "#00ccff";
+    g.fillStyle = this.color;
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
 
@@ -650,13 +569,13 @@ function transformTile(tile: RawTile) {
     case RawTile.FALLING_STONE:
       return new Stone(new Falling());
     case RawTile.KEY1:
-      return new Key1();
+      return new Key("#ffcc00", new RemoveLock1());
     case RawTile.LOCK1:
-      return new Lock1();
+      return new Lock1("#ffcc00", true);
     case RawTile.KEY2:
-      return new Key2();
+      return new Key("#00ccff", new RemoveLock2());
     case RawTile.LOCK2:
-      return new Lock2();
+      return new Lock1("#00ccff", false);
     default:
       assertExhausted(tile);
   }
