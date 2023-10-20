@@ -2,6 +2,24 @@ const TILE_SIZE = 30;
 const FPS = 30;
 const SLEEP = 1000 / FPS;
 
+class FallStrategy {
+  constructor(private falling: FallingState) {}
+
+  getFalling() {
+    return this.falling;
+  }
+
+  update(tile: Tile, x: number, y: number) {
+    if (map[y + 1][x].isAir()) {
+      this.falling = new Falling();
+      map[y + 1][x] = tile;
+      map[y][x] = new Air();
+    } else if (map[y][x].isFalling()) {
+      this.falling = new Resting();
+    }
+  }
+}
+
 interface FallingState {
   isFalling(): boolean;
   moveHorizontal(tile: Tile, dx: number): void;
@@ -225,7 +243,10 @@ class Player implements Tile {
 }
 
 class Stone implements Tile {
-  constructor(private falling: FallingState) {}
+  private fallStrategy: FallStrategy;
+  constructor(private falling: FallingState) {
+    this.fallStrategy = new FallStrategy(falling);
+  }
 
   isAir(): boolean {
     return false;
@@ -250,7 +271,7 @@ class Stone implements Tile {
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
   moveHorizontal(dx: number) {
-    this.falling.moveHorizontal(this, dx);
+    this.fallStrategy.getFalling().moveHorizontal(this, dx);
   }
 
   isStony() {
@@ -272,13 +293,7 @@ class Stone implements Tile {
     return true;
   }
   update(x: number, y: number) {
-    if (map[y + 1][x].isAir()) {
-      this.falling = new Falling();
-      map[y + 1][x] = this;
-      map[y][x] = new Air();
-    } else if (map[y][x].isFalling()) {
-      this.falling = new Resting();
-    }
+    this.fallStrategy.update(this, x, y);
   }
 }
 
