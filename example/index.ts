@@ -365,7 +365,7 @@ class Box implements Tile {
 }
 
 class Key implements Tile {
-  constructor(private color: string, private removeStrategy: RemoveStrategy) {}
+  constructor(private keyConf: KeyConfiguration) {}
 
   isAir(): boolean {
     return false;
@@ -386,11 +386,11 @@ class Key implements Tile {
     return false;
   }
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-    g.fillStyle = this.color;
+    g.fillStyle = this.keyConf.getColor();
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
   moveHorizontal(dx: number) {
-    remove(this.removeStrategy);
+    remove(this.keyConf.getRemoveStrategy());
     moveToTile(playerx + dx, playery);
   }
   isStony() {
@@ -411,7 +411,7 @@ class Key implements Tile {
 }
 
 class Lock1 implements Tile {
-  constructor(private color: string, private lock1: boolean) {}
+  constructor(private keyConf: KeyConfiguration) {}
   isAir(): boolean {
     return false;
   }
@@ -422,16 +422,16 @@ class Lock1 implements Tile {
     return false;
   }
   isLock1(): boolean {
-    return this.lock1;
+    return this.keyConf.is1();
   }
   isKey2(): boolean {
     return false;
   }
   isLock2(): boolean {
-    return !this.lock1;
+    return !this.keyConf.is1();
   }
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-    g.fillStyle = this.color;
+    g.fillStyle = this.keyConf.getColor();
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
 
@@ -451,6 +451,40 @@ class Lock1 implements Tile {
     return false;
   }
   update(x: number, y: number) {}
+}
+
+class KeyConfiguration {
+  constructor(
+    private color: string,
+    private _1: boolean,
+    private removeStrategy: RemoveStrategy
+  ) {}
+
+  getColor() {
+    return this.color;
+  }
+  is1() {
+    return this._1;
+  }
+  getRemoveStrategy() {
+    return this.removeStrategy;
+  }
+}
+
+interface RemoveStrategy {
+  check(tile: Tile): boolean;
+}
+
+class RemoveLock1 {
+  check(tile: Tile) {
+    return tile.isLock1();
+  }
+}
+
+class RemoveLock2 {
+  check(tile: Tile) {
+    return tile.isLock2();
+  }
 }
 
 interface Input {
@@ -550,6 +584,10 @@ let map: Tile[][];
 function assertExhausted(x: never) {
   throw new Error("Unexpected object " + x);
 }
+
+const YELLOW_KEY = new KeyConfiguration("#ffcc00", true, new RemoveLock1());
+const BLUE_KEY = new KeyConfiguration("#00ccff", false, new RemoveLock2());
+
 function transformTile(tile: RawTile) {
   switch (tile) {
     case RawTile.AIR:
@@ -569,13 +607,13 @@ function transformTile(tile: RawTile) {
     case RawTile.FALLING_STONE:
       return new Stone(new Falling());
     case RawTile.KEY1:
-      return new Key("#ffcc00", new RemoveLock1());
+      return new Key(YELLOW_KEY);
     case RawTile.LOCK1:
-      return new Lock1("#ffcc00", true);
+      return new Lock1(YELLOW_KEY);
     case RawTile.KEY2:
-      return new Key("#00ccff", new RemoveLock2());
+      return new Key(BLUE_KEY);
     case RawTile.LOCK2:
-      return new Lock1("#00ccff", false);
+      return new Lock1(BLUE_KEY);
     default:
       assertExhausted(tile);
   }
@@ -592,22 +630,6 @@ function transformMap() {
 }
 
 let inputs: Input[] = [];
-
-interface RemoveStrategy {
-  check(tile: Tile): boolean;
-}
-
-class RemoveLock1 {
-  check(tile: Tile) {
-    return tile.isLock1();
-  }
-}
-
-class RemoveLock2 {
-  check(tile: Tile) {
-    return tile.isLock2();
-  }
-}
 
 function remove(shouldRemove: RemoveLock1) {
   for (let y = 0; y < map.length; y++) {
