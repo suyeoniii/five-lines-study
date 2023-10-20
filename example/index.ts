@@ -2,6 +2,11 @@ const TILE_SIZE = 30;
 const FPS = 30;
 const SLEEP = 1000 / FPS;
 
+enum FallingState {
+  FALLING,
+  RESTING,
+}
+
 enum RawTile {
   AIR,
   FLUX,
@@ -209,7 +214,7 @@ class Player implements Tile {
 }
 
 class Stone implements Tile {
-  constructor(private falling: boolean) {}
+  constructor(private falling: FallingState) {}
 
   isAir(): boolean {
     return false;
@@ -223,8 +228,8 @@ class Stone implements Tile {
   isPlayer(): boolean {
     return false;
   }
-  isFallingStone(): boolean {
-    return this.falling;
+  isFallingStone() {
+    return this.falling === FallingState.FALLING;
   }
   isFallingBox(): boolean {
     return false;
@@ -661,9 +666,9 @@ function transformTile(tile: RawTile) {
     case RawTile.FALLING_BOX:
       return new FallingBox();
     case RawTile.STONE:
-      return new Stone(false);
+      return new Stone(FallingState.RESTING);
     case RawTile.FALLING_STONE:
-      return new Stone(true);
+      return new Stone(FallingState.FALLING);
     case RawTile.KEY1:
       return new Key1();
     case RawTile.LOCK1:
@@ -750,13 +755,13 @@ function updateMap() {
 
 function updateTile(x: number, y: number) {
   if (map[y][x].isStony() && map[y + 1][x].isAir()) {
-    map[y + 1][x] = new Stone(true);
+    map[y + 1][x] = new Stone(FallingState.FALLING);
     map[y][x] = new Air();
   } else if (map[y][x].isBoxy() && map[y + 1][x].isAir()) {
     map[y + 1][x] = new FallingBox();
     map[y][x] = new Air();
   } else if (map[y][x].isFallingStone()) {
-    map[y][x] = new Stone(false);
+    map[y][x] = new Stone(FallingState.RESTING);
   } else if (map[y][x].isFallingBox()) {
     map[y][x] = new Box();
   }
