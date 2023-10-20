@@ -5,6 +5,7 @@ const SLEEP = 1000 / FPS;
 interface FallingState {
   isFalling(): boolean;
   isResting(): boolean;
+  moveHorizontal(tile: Tile, dx: number): void;
 }
 
 class Falling implements FallingState {
@@ -14,6 +15,7 @@ class Falling implements FallingState {
   isResting() {
     return false;
   }
+  moveHorizontal(tile: Tile, dx: number) {}
 }
 
 class Resting implements FallingState {
@@ -22,6 +24,15 @@ class Resting implements FallingState {
   }
   isResting() {
     return true;
+  }
+  moveHorizontal(tile: Tile, dx: number) {
+    if (
+      map[playery][playerx + dx + dx].isAir() &&
+      !map[playery + 1][playerx + dx].isAir()
+    ) {
+      map[playery][playerx + dx + dx] = tile;
+      moveToTile(playerx + dx, playery);
+    }
   }
 }
 
@@ -269,16 +280,7 @@ class Stone implements Tile {
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
   moveHorizontal(dx: number) {
-    if (this.isFallingStone() === false) {
-      if (
-        map[playery][playerx + dx + dx].isAir() &&
-        !map[playery + 1][playerx + dx].isAir()
-      ) {
-        map[playery][playerx + dx + dx] = this;
-        moveToTile(playerx + dx, playery);
-      }
-    } else if (this.isFallingStone() === true) {
-    }
+    this.falling.moveHorizontal(this, dx);
   }
 
   isStony() {
