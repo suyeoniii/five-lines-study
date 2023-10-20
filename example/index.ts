@@ -47,8 +47,6 @@ enum RawTile {
 interface Tile {
   isAir(): boolean;
   isFlux(): boolean;
-  isUnbreakable(): boolean;
-  isPlayer(): boolean;
   isKey1(): boolean;
   isLock1(): boolean;
   isKey2(): boolean;
@@ -69,12 +67,6 @@ class Air implements Tile {
     return true;
   }
   isFlux(): boolean {
-    return false;
-  }
-  isUnbreakable(): boolean {
-    return false;
-  }
-  isPlayer(): boolean {
     return false;
   }
   isKey1(): boolean {
@@ -116,12 +108,6 @@ class Flux implements Tile {
   }
   isFlux(): boolean {
     return true;
-  }
-  isUnbreakable(): boolean {
-    return false;
-  }
-  isPlayer(): boolean {
-    return false;
   }
   isKey1(): boolean {
     return false;
@@ -166,12 +152,6 @@ class Unbreakable implements Tile {
   isFlux(): boolean {
     return false;
   }
-  isUnbreakable(): boolean {
-    return true;
-  }
-  isPlayer(): boolean {
-    return false;
-  }
   isKey1(): boolean {
     return false;
   }
@@ -213,12 +193,6 @@ class Player implements Tile {
   isFlux(): boolean {
     return false;
   }
-  isUnbreakable(): boolean {
-    return false;
-  }
-  isPlayer(): boolean {
-    return true;
-  }
   isKey1(): boolean {
     return false;
   }
@@ -257,12 +231,6 @@ class Stone implements Tile {
     return false;
   }
   isFlux(): boolean {
-    return false;
-  }
-  isUnbreakable(): boolean {
-    return false;
-  }
-  isPlayer(): boolean {
     return false;
   }
   isKey1(): boolean {
@@ -321,12 +289,6 @@ class Box implements Tile {
     return false;
   }
   isFlux(): boolean {
-    return false;
-  }
-  isUnbreakable(): boolean {
-    return false;
-  }
-  isPlayer(): boolean {
     return false;
   }
   isKey1(): boolean {
@@ -392,12 +354,6 @@ class Key1 implements Tile {
   isFlux(): boolean {
     return false;
   }
-  isUnbreakable(): boolean {
-    return false;
-  }
-  isPlayer(): boolean {
-    return false;
-  }
   isKey1(): boolean {
     return true;
   }
@@ -442,12 +398,6 @@ class Lock1 implements Tile {
   isFlux(): boolean {
     return false;
   }
-  isUnbreakable(): boolean {
-    return false;
-  }
-  isPlayer(): boolean {
-    return false;
-  }
   isKey1(): boolean {
     return false;
   }
@@ -487,12 +437,6 @@ class Key2 implements Tile {
     return false;
   }
   isFlux(): boolean {
-    return false;
-  }
-  isUnbreakable(): boolean {
-    return false;
-  }
-  isPlayer(): boolean {
     return false;
   }
   isKey1(): boolean {
@@ -536,12 +480,6 @@ class Lock2 implements Tile {
     return false;
   }
   isFlux(): boolean {
-    return false;
-  }
-  isUnbreakable(): boolean {
-    return false;
-  }
-  isPlayer(): boolean {
     return false;
   }
   isKey1(): boolean {
