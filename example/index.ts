@@ -73,6 +73,7 @@ interface Tile {
   isLock2(): boolean;
   draw(g: CanvasRenderingContext2D, x: number, y: number): void;
   moveHorizontal(dx: number): void;
+  moveVertical(dy: number): void;
   isStony(): boolean;
   isBoxy(): boolean;
   drop(): void;
@@ -104,6 +105,9 @@ class Air implements Tile {
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {}
   moveHorizontal(dx: number) {
     moveToTile(playerx + dx, playery);
+  }
+  moveVertical(dy: number) {
+    moveToTile(playerx, playery + dy);
   }
   isStony() {
     return false;
@@ -148,6 +152,9 @@ class Flux implements Tile {
   moveHorizontal(dx: number) {
     moveToTile(playerx + dx, playery);
   }
+  moveVertical(dy: number) {
+    moveToTile(playerx, playery + dy);
+  }
   isStony() {
     return false;
   }
@@ -189,6 +196,7 @@ class Unbreakable implements Tile {
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
   moveHorizontal(dx: number) {}
+  moveVertical(dy: number) {}
   isStony() {
     return false;
   }
@@ -227,6 +235,7 @@ class Player implements Tile {
   }
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {}
   moveHorizontal(dx: number) {}
+  moveVertical(dy: number) {}
   isStony() {
     return false;
   }
@@ -275,7 +284,9 @@ class Stone implements Tile {
   moveHorizontal(dx: number) {
     this.fallStrategy.getFalling().moveHorizontal(this, dx);
   }
-
+  moveVertical(dy: number) {
+    moveToTile(playerx, playery + dy);
+  }
   isStony() {
     return true;
   }
@@ -335,6 +346,9 @@ class Box implements Tile {
       }
     }
   }
+  moveVertical(dy: number) {
+    moveToTile(playerx, playery + dy);
+  }
   isStony() {
     return false;
   }
@@ -390,8 +404,12 @@ class Key implements Tile {
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
   moveHorizontal(dx: number) {
-    remove(this.keyConf.getRemoveStrategy());
+    this.keyConf.removeLock();
     moveToTile(playerx + dx, playery);
+  }
+  moveVertical(dy: number) {
+    this.keyConf.removeLock();
+    moveToTile(playerx, playery + dy);
   }
   isStony() {
     return false;
@@ -431,11 +449,11 @@ class Lock1 implements Tile {
     return !this.keyConf.is1();
   }
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-    g.fillStyle = this.keyConf.getColor();
+    this.keyConf.setColor(g);
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
-
   moveHorizontal(dx: number) {}
+  moveVertical(dy: number) {}
   isStony() {
     return false;
   }
@@ -463,11 +481,14 @@ class KeyConfiguration {
   getColor() {
     return this.color;
   }
+  setColor(g: CanvasRenderingContext2D) {
+    g.fillStyle = this.color;
+  }
   is1() {
     return this._1;
   }
-  getRemoveStrategy() {
-    return this.removeStrategy;
+  removeLock() {
+    remove(this.removeStrategy);
   }
 }
 
