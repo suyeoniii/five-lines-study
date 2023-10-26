@@ -6,7 +6,7 @@ class FallStrategy {
   constructor(private falling: FallingState) {}
 
   update(tile: Tile, x: number, y: number) {
-    this.falling = map[y + 1][x].isAir() ? new Falling() : new Resting();
+    this.falling = map[y + 1][x].getBlockOnTopState();
     this.drop(y, x, tile);
   }
 
@@ -81,6 +81,7 @@ interface Tile {
   isFalling(): boolean;
   canFall(): boolean;
   update(x: number, y: number): void;
+  getBlockOnTopState(): FallingState;
 }
 
 class Air implements Tile {
@@ -125,6 +126,9 @@ class Air implements Tile {
     return false;
   }
   update(x: number, y: number) {}
+  getBlockOnTopState() {
+    return new Falling();
+  }
 }
 
 class Flux implements Tile {
@@ -171,6 +175,9 @@ class Flux implements Tile {
     return false;
   }
   update(x: number, y: number) {}
+  getBlockOnTopState(): FallingState {
+    return new Resting();
+  }
 }
 
 class Unbreakable implements Tile {
@@ -213,6 +220,9 @@ class Unbreakable implements Tile {
     return false;
   }
   update(x: number, y: number) {}
+  getBlockOnTopState(): FallingState {
+    return new Resting();
+  }
 }
 
 class Player implements Tile {
@@ -252,6 +262,9 @@ class Player implements Tile {
     return false;
   }
   update(x: number, y: number) {}
+  getBlockOnTopState(): FallingState {
+    return new Resting();
+  }
 }
 
 class Stone implements Tile {
@@ -308,6 +321,9 @@ class Stone implements Tile {
   }
   update(x: number, y: number) {
     this.fallStrategy.update(this, x, y);
+  }
+  getBlockOnTopState(): FallingState {
+    return new Resting();
   }
 }
 
@@ -377,6 +393,9 @@ class Box implements Tile {
       map[y][x].rest();
     }
   }
+  getBlockOnTopState(): FallingState {
+    return new Resting();
+  }
 }
 
 class Key implements Tile {
@@ -429,6 +448,9 @@ class Key implements Tile {
     return false;
   }
   update(x: number, y: number) {}
+  getBlockOnTopState(): FallingState {
+    return new Resting();
+  }
 }
 
 class Lock1 implements Tile {
@@ -475,6 +497,9 @@ class Lock1 implements Tile {
     return false;
   }
   update(x: number, y: number) {}
+  getBlockOnTopState(): FallingState {
+    return new Resting();
+  }
 }
 
 class KeyConfiguration {
@@ -495,6 +520,9 @@ class KeyConfiguration {
   }
   removeLock() {
     remove(this.removeStrategy);
+  }
+  getBlockOnTopState(): FallingState {
+    return new Resting();
   }
 }
 
