@@ -103,6 +103,7 @@ class Air implements Tile {
     return false;
   }
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {}
+  fillRect(g: CanvasRenderingContext2D, x: number, y: number) {}
   moveHorizontal(dx: number) {
     moveToTile(playerx + dx, playery);
   }
@@ -380,7 +381,6 @@ class Box implements Tile {
 
 class Key implements Tile {
   constructor(private keyConf: KeyConfiguration) {}
-
   isAir(): boolean {
     return false;
   }
@@ -400,7 +400,10 @@ class Key implements Tile {
     return false;
   }
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
-    g.fillStyle = this.keyConf.getColor();
+    this.keyConf.setColor(g);
+    this.fillRect(g, x, y);
+  }
+  fillRect(g: CanvasRenderingContext2D, x: number, y: number) {
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
   moveHorizontal(dx: number) {
@@ -450,6 +453,9 @@ class Lock1 implements Tile {
   }
   draw(g: CanvasRenderingContext2D, x: number, y: number): void {
     this.keyConf.setColor(g);
+    this.fillRect(g, x, y);
+  }
+  fillRect(g: CanvasRenderingContext2D, x: number, y: number) {
     g.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
   }
   moveHorizontal(dx: number) {}
