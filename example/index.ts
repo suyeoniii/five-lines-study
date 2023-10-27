@@ -10,6 +10,29 @@ class Map {
   setMap(map: Tile[][]) {
     this.map = map;
   }
+  transform() {
+    this.map = new Array(rawMap.length);
+    for (let y = 0; y < rawMap.length; y++) {
+      this.map[y] = new Array(rawMap[y].length);
+      for (let x = 0; x < rawMap[y].length; x++) {
+        this.map[y][x] = transformTile(rawMap[y][x]);
+      }
+    }
+  }
+  update() {
+    for (let y = this.map.length - 1; y >= 0; y--) {
+      for (let x = 0; x < this.map[y].length; x++) {
+        this.map[y][x].update(map, x, y);
+      }
+    }
+  }
+  draw(g: CanvasRenderingContext2D) {
+    for (let y = 0; y < this.map.length; y++) {
+      for (let x = 0; x < this.map[y].length; x++) {
+        this.map[y][x].draw(g, x, y);
+      }
+    }
+  }
 }
 let map = new Map();
 
@@ -701,16 +724,6 @@ function transformTile(tile: RawTile) {
   }
 }
 
-function transformMap() {
-  map.setMap(new Array(rawMap.length));
-  for (let y = 0; y < rawMap.length; y++) {
-    map.getMap()[y] = new Array(rawMap[y].length);
-    for (let x = 0; x < rawMap[y].length; x++) {
-      map.getMap()[y][x] = transformTile(rawMap[y][x]);
-    }
-  }
-}
-
 let inputs: Input[] = [];
 
 function remove(shouldRemove: RemoveLock1) {
@@ -723,17 +736,9 @@ function remove(shouldRemove: RemoveLock1) {
   }
 }
 
-function update(player: Player) {
+function update(map: Map, player: Player) {
   handleInputs(player);
-  updateMap();
-}
-
-function updateMap() {
-  for (let y = map.getMap().length - 1; y >= 0; y--) {
-    for (let x = 0; x < map.getMap()[y].length; x++) {
-      map.getMap()[y][x].update(map, x, y);
-    }
-  }
+  map.update();
 }
 
 function handleInputs(player: Player) {
@@ -747,9 +752,9 @@ function handleInput(player: Player, input: Input) {
   input.handle(player);
 }
 
-function draw(player: Player) {
+function draw(map: Map, player: Player) {
   let g = createGraphics();
-  drawMap(g);
+  map.draw(g);
   player.drawPlayer(g);
 }
 
@@ -761,18 +766,10 @@ function createGraphics() {
   return g;
 }
 
-function drawMap(g: CanvasRenderingContext2D) {
-  for (let y = 0; y < map.getMap().length; y++) {
-    for (let x = 0; x < map.getMap()[y].length; x++) {
-      map.getMap()[y][x].draw(g, x, y);
-    }
-  }
-}
-
 function gameLoop(player: Player) {
   let before = Date.now();
-  update(player);
-  draw(player);
+  update(map, player);
+  draw(map, player);
   let after = Date.now();
   let frameTime = after - before;
   let sleep = SLEEP - frameTime;
@@ -780,7 +777,7 @@ function gameLoop(player: Player) {
 }
 
 window.onload = () => {
-  transformMap();
+  map.transform();
   gameLoop(player);
 };
 
