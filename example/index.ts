@@ -4,10 +4,7 @@ const SLEEP = 1000 / FPS;
 
 class Map {
   private map: Tile[][];
-  private getMap() {
-    return this.map;
-  }
-  transform() {
+  constrctor() {
     this.map = new Array(rawMap.length);
     for (let y = 0; y < rawMap.length; y++) {
       this.map[y] = new Array(rawMap[y].length);
@@ -41,7 +38,7 @@ class Map {
     this.map[y][x + dx].moveHorizontal(map, player, dx);
   }
   moveVertical(player: Player, x: number, y: number, dy: number) {
-    map.getMap()[y + dy][x].moveVertical(map, player, dy);
+    this.map[y + dy][x].moveVertical(map, player, dy);
   }
   isAir(x: number, y: number) {
     return this.map[y][x].isAir();
@@ -788,7 +785,6 @@ function gameLoop(player: Player) {
 }
 
 window.onload = () => {
-  map.transform();
   gameLoop(player);
 };
 
